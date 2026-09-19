@@ -1,0 +1,41 @@
+{
+  "manifest_version": 3,
+  "name": "B站合集时长进度",
+  "version": "1.1.0",
+  "description": "在B站合集播放页显示合集总时长进度（含已播放时长/总时长/百分比），而不仅是集数进度",
+  "host_permissions": [
+    "https://www.bilibili.com/*",
+    "https://api.bilibili.com/*"
+  ],
+  "permissions": [
+    "storage"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.bilibili.com/video/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "content.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "B站合集时长进度 - 设置",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

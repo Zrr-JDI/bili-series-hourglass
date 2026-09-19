@@ -1,0 +1,271 @@
+/* B站合集时长进度 - 注入样式 */
+/* 使用 !important 覆盖 B 站可能的继承样式，确保稳定渲染 */
+
+.bili-cp {
+  margin: 8px 12px !important;
+  padding: 10px 12px !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-radius: 6px !important;
+  box-sizing: border-box !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, "PingFang SC", "Microsoft YaHei", sans-serif !important;
+  color: #fff !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  line-height: 1.4 !important;
+  display: block !important;
+  position: relative !important;
+  width: auto !important;
+  height: auto !important;
+  overflow: hidden !important;
+  border: none !important;
+  box-shadow: none !important;
+  text-align: left !important;
+  text-indent: 0 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  text-decoration: none !important;
+  vertical-align: baseline !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  z-index: 1 !important;
+  pointer-events: auto !important;
+  cursor: default !important;
+}
+
+.bili-cp * {
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: none !important;
+  outline: none !important;
+  font: inherit !important;
+  color: inherit !important;
+  text-align: left !important;
+  text-indent: 0 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  text-decoration: none !important;
+  display: block !important;
+  float: none !important;
+  clear: none !important;
+  position: static !important;
+  width: auto !important;
+  height: auto !important;
+  overflow: visible !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.bili-cp__head {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin-bottom: 8px !important;
+  width: 100% !important;
+  height: auto !important;
+}
+
+.bili-cp__label {
+  font-size: 12px !important;
+  color: #999 !important;
+  font-weight: 400 !important;
+  flex: 0 0 auto !important;
+}
+
+.bili-cp__percent {
+  font-size: 13px !important;
+  color: #fb7299 !important;
+  font-weight: 600 !important;
+  flex: 0 0 auto !important;
+  font-variant-numeric: tabular-nums !important;
+  font-feature-settings: "tnum" !important;
+}
+
+.bili-cp__time {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  font-size: 12px !important;
+  font-variant-numeric: tabular-nums !important;
+  font-feature-settings: "tnum" !important;
+}
+
+.bili-cp__cur {
+  color: #fff !important;
+  flex: 0 0 auto !important;
+}
+
+.bili-cp__sep {
+  color: #666 !important;
+  margin: 0 6px !important;
+  flex: 0 0 auto !important;
+}
+
+.bili-cp__total {
+  color: #999 !important;
+  flex: 0 0 auto !important;
+}
+
+/* 兜底：在浅色主题或背景变亮时保持可读 */
+@media (prefers-color-scheme: light) {
+  .bili-cp {
+    background: rgba(0, 0, 0, 0.04) !important;
+    color: #333 !important;
+  }
+  .bili-cp__label {
+    color: #666 !important;
+  }
+  .bili-cp__cur {
+    color: #333 !important;
+  }
+  .bili-cp__total {
+    color: #999 !important;
+  }
+  .bili-cp__sep {
+    color: #bbb !important;
+  }
+}
+
+/* ---------- 浮动小窗基础样式（横向/竖向共用） ---------- */
+.bili-cp--float {
+  position: fixed !important;
+  width: 260px !important;
+  margin: 0 !important;
+  padding: 10px 12px !important;
+  background: rgba(20, 20, 24, 0.92) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border-radius: 8px !important;
+  z-index: 2147483646 !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35) !important;
+  color: #fff !important;
+  cursor: move !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  transition: box-shadow 0.15s ease, transform 0.15s ease !important;
+}
+.bili-cp--float:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 20px rgba(251, 114, 153, 0.25) !important;
+}
+.bili-cp--float.bili-cp--dragging {
+  cursor: grabbing !important;
+  opacity: 0.85 !important;
+  transform: none !important;
+  box-shadow: 0 8px 24px rgba(251, 114, 153, 0.4) !important;
+}
+.bili-cp--float.bili-cp--fixed {
+  cursor: default !important;
+}
+.bili-cp--float .bili-cp__time {
+  font-size: 11px !important;
+}
+
+/* ---------- 横向布局（默认） ---------- */
+/* 沿用 .bili-cp__head 横排 + .bili-cp__time 横排 */
+.bili-cp--landscape .bili-cp__head {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin-bottom: 8px !important;
+  width: 100% !important;
+}
+.bili-cp--landscape .bili-cp__time {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+}
+
+/* ---------- 竖向布局 ---------- */
+.bili-cp--portrait {
+  width: auto !important;
+  min-width: 120px !important;
+  padding: 10px 12px !important;
+  text-align: center !important;
+}
+.bili-cp--portrait .bili-cp__title {
+  font-size: 11px !important;
+  color: #aaa !important;
+  font-weight: 500 !important;
+  margin-bottom: 6px !important;
+  text-align: center !important;
+  width: 100% !important;
+}
+.bili-cp--portrait .bili-cp__percent {
+  font-size: 18px !important;
+  color: #fb7299 !important;
+  font-weight: 600 !important;
+  margin-bottom: 8px !important;
+  text-align: center !important;
+  width: 100% !important;
+  font-variant-numeric: tabular-nums !important;
+  font-feature-settings: "tnum" !important;
+}
+/* 时间：分子（当前时间）在上，横线分隔，分母（总时长）在下 */
+.bili-cp--portrait .bili-cp__time {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  font-size: 12px !important;
+  font-variant-numeric: tabular-nums !important;
+  font-feature-settings: "tnum" !important;
+  line-height: 1.5 !important;
+}
+.bili-cp--portrait .bili-cp__cur {
+  color: #fff !important;
+  text-align: center !important;
+  width: 100% !important;
+  padding: 1px 0 !important;
+}
+.bili-cp--portrait .bili-cp__frac-line {
+  width: 80% !important;
+  height: 0 !important;
+  border-top: 1px solid #666 !important;
+  margin: 3px auto !important;
+}
+.bili-cp--portrait .bili-cp__total {
+  color: #999 !important;
+  text-align: center !important;
+  width: 100% !important;
+  padding: 1px 0 !important;
+}
+
+/* 隐藏百分比/时间（兼容显示开关） */
+.bili-cp--no-percent.bili-cp--portrait .bili-cp__percent {
+  display: none !important;
+}
+.bili-cp--no-time.bili-cp--portrait .bili-cp__time {
+  display: none !important;
+}
+.bili-cp--no-percent.bili-cp--landscape .bili-cp__percent {
+  display: none !important;
+}
+.bili-cp--no-percent.bili-cp--landscape .bili-cp__head {
+  justify-content: flex-start !important;
+}
+.bili-cp--no-time.bili-cp--landscape .bili-cp__time {
+  display: none !important;
+}
+
+/* 浮动位置在浅色主题下仍保持深色背景（因为是浮动覆盖层） */
+@media (prefers-color-scheme: light) {
+  .bili-cp--float {
+    background: rgba(20, 20, 24, 0.92) !important;
+    color: #fff !important;
+  }
+  .bili-cp--float .bili-cp__cur {
+    color: #fff !important;
+  }
+  .bili-cp--float .bili-cp__label,
+  .bili-cp--portrait .bili-cp__title {
+    color: #aaa !important;
+  }
+  .bili-cp--float .bili-cp__total {
+    color: #999 !important;
+  }
+}

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>B站合集时长进度 - 设置</title>
+  <style>
+    :root {
+      --pink: #fb7299;
+      --bg: #fff;
+      --fg: #222;
+      --muted: #888;
+      --border: #eee;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 320px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      font-size: 13px;
+      color: var(--fg);
+      background: var(--bg);
+    }
+    .container {
+      padding: 14px 16px;
+    }
+    h1 {
+      font-size: 14px;
+      font-weight: 600;
+      margin: 0 0 4px 0;
+      color: var(--pink);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .subtitle {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .row .label {
+      font-size: 13px;
+      color: var(--fg);
+    }
+    select {
+      font-size: 12px;
+      padding: 4px 8px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: #fff;
+      color: var(--fg);
+      min-width: 150px;
+      cursor: pointer;
+      outline: none;
+    }
+    select:focus { border-color: var(--pink); }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 36px;
+      height: 20px;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #ccc;
+      transition: 0.2s;
+      border-radius: 20px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 14px;
+      width: 14px;
+      left: 3px;
+      bottom: 3px;
+      background-color: #fff;
+      transition: 0.2s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: var(--pink);
+    }
+    input:checked + .slider:before {
+      transform: translateX(16px);
+    }
+    .desc {
+      font-size: 11px;
+      color: var(--muted);
+      margin: -8px 0 12px;
+      line-height: 1.5;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 14px 0;
+    }
+    .actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    button {
+      flex: 1;
+      padding: 7px 10px;
+      font-size: 12px;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--fg);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    button:hover {
+      border-color: var(--pink);
+      color: var(--pink);
+    }
+    button.primary {
+      background: var(--pink);
+      color: #fff;
+      border-color: var(--pink);
+    }
+    button.primary:hover {
+      background: #f5577f;
+      border-color: #f5577f;
+      color: #fff;
+    }
+    .status {
+      margin-top: 10px;
+      font-size: 11px;
+      color: var(--muted);
+      min-height: 14px;
+      text-align: center;
+    }
+    .status.success { color: #52c41a; }
+    .status.error { color: #f5222d; }
+    .footer {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 14px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>B站合集时长进度</h1>
+    <div class="subtitle">v1.1.0 · 自定义显示位置</div>
+
+    <div class="row">
+      <span class="label">固定位置</span>
+      <label class="switch">
+        <input type="checkbox" id="fixedPosition">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="row">
+      <span class="label">显示方向</span>
+      <select id="orientation">
+        <option value="landscape">横向</option>
+        <option value="portrait">竖向</option>
+      </select>
+    </div>
+    <div class="desc" id="oriDesc"></div>
+
+    <hr>
+
+    <div class="row">
+      <span class="label">显示百分比文字</span>
+      <label class="switch">
+        <input type="checkbox" id="showPercent" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="row">
+      <span class="label">显示时间 (已播/总)</span>
+      <label class="switch">
+        <input type="checkbox" id="showTime" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="actions">
+      <button id="diagnose">诊断当前页</button>
+      <button id="save" class="primary">保存并刷新</button>
+    </div>
+    <div class="status" id="status"></div>
+
+    <div class="footer">
+      提示：若合集页未显示，请点击"诊断当前页"并查看 DevTools Console
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
