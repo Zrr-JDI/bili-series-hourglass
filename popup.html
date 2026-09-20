@@ -159,7 +159,7 @@
 <body>
   <div class="container">
     <h1>B站合集时长进度</h1>
-    <div class="subtitle">v1.1.0 · 自定义显示位置</div>
+    <div class="subtitle">v1.1.1 · 自动保存</div>
 
     <div class="row">
       <span class="label">固定位置</span>
@@ -196,13 +196,13 @@
     </div>
 
     <div class="actions">
+      <button id="resetPos">重置位置</button>
       <button id="diagnose">诊断当前页</button>
-      <button id="save" class="primary">保存并刷新</button>
     </div>
     <div class="status" id="status"></div>
 
     <div class="footer">
-      提示：若合集页未显示，请点击"诊断当前页"并查看 DevTools Console
+      配置更改自动保存并应用 · 若合集页未显示请点"诊断当前页"
     </div>
   </div>
   <script src="popup.js"></script>

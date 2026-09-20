@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "B站合集时长进度",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "在B站合集播放页显示合集总时长进度（含已播放时长/总时长/百分比），而不仅是集数进度",
   "host_permissions": [
     "https://www.bilibili.com/*",

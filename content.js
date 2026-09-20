@@ -351,12 +351,31 @@
     root.classList.toggle("bili-cp--no-time", !state.config.showTime);
   }
 
-  // 应用浮动位置：优先用用户拖动后保存的 floatPos，否则用默认右下角
+  // 应用浮动位置：优先用用户拖动后保存的 floatPos，否则用默认右下角。
+  // 检测 floatPos 是否在当前视口内，超出则自动重置为默认右下角
+  // （防止用户在大屏保存位置后切到小屏看不到进度条）。
+  // 注意：调用此函数前 root 必须已在 DOM 中，否则 offsetWidth/offsetHeight 为 0。
   function applyFloatPos(root) {
     if (!root) return;
     var fp = state.config && state.config.floatPos;
     if (fp && typeof fp.left === "number" && typeof fp.top === "number" &&
         !isNaN(fp.left) && !isNaN(fp.top)) {
+      // 视口边界检查：用 root 实际尺寸
+      var vw = window.innerWidth;
+      var vh = window.innerHeight;
+      var w = root.offsetWidth || 0;
+      var h = root.offsetHeight || 0;
+      if (fp.left < 0 || fp.top < 0 || fp.left + w > vw || fp.top + h > vh) {
+        log("floatPos 超出当前视口，自动重置为默认右下角:", JSON.stringify(fp),
+            "视口:", vw + "x" + vh, "root:", w + "x" + h);
+        state.config.floatPos = null;
+        try { chrome.storage.local.remove("floatPos"); } catch (e) {}
+        root.style.left = "auto";
+        root.style.top = "auto";
+        root.style.right = "16px";
+        root.style.bottom = "16px";
+        return;
+      }
       root.style.left = fp.left + "px";
       root.style.top = fp.top + "px";
       root.style.right = "auto";
@@ -486,7 +505,6 @@
 
     var root = buildRoot(ori);
     applyDisplayOptions(root);
-    applyFloatPos(root);
     state.currentPosition = "float_" + ori;
 
     try {
@@ -496,6 +514,9 @@
       state.rootEl = null;
       return false;
     }
+
+    // 先 appendChild 再 applyFloatPos，这样能用实际 offsetWidth/offsetHeight 做视口检查
+    applyFloatPos(root);
 
     state.rootEl = root;
     // 启用拖动（仅当未开启"固定位置"开关时）
@@ -815,9 +836,25 @@
         if (!msg || !msg.type) return;
         if (msg.type === "BILI_CP_CONFIG_UPDATE") {
           log("收到配置更新:", JSON.stringify(msg.config));
-          state.config = Object.assign({}, DEFAULT_CONFIG, msg.config || {});
+          // 保留现有 floatPos：popup 不发送此字段，避免每次保存都重置位置
+          var prevFloatPos = state.config ? state.config.floatPos : undefined;
+          state.config = Object.assign({}, DEFAULT_CONFIG, state.config || {}, msg.config || {});
+          if (msg.config.floatPos === undefined && prevFloatPos !== undefined) {
+            state.config.floatPos = prevFloatPos;
+          }
           // 立即应用
           applyConfigChange();
+          sendResponse && sendResponse({ ok: true });
+        } else if (msg.type === "BILI_CP_RESET_POS") {
+          // 重置位置到默认右下角
+          log("收到重置位置请求");
+          state.config.floatPos = null;
+          if (state.rootEl) {
+            state.rootEl.style.left = "auto";
+            state.rootEl.style.top = "auto";
+            state.rootEl.style.right = "16px";
+            state.rootEl.style.bottom = "16px";
+          }
           sendResponse && sendResponse({ ok: true });
         } else if (msg.type === "BILI_CP_DIAGNOSE") {
           var r = diagnose();

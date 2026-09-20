@@ -1,5 +1,5 @@
 /* B站合集时长进度 - popup 脚本
- * 将配置保存到 chrome.storage.local，并通知当前 tab 的 content script 重新应用。
+ * 配置更改自动保存并通知 content script；popup 关闭时兜底保存。
  */
 
 var DEFAULT_CONFIG = {
@@ -25,7 +25,7 @@ function showStatus(msg, type) {
     setTimeout(function () {
       el.textContent = "";
       el.className = "status";
-    }, 3000);
+    }, 2000);
   }
 }
 
@@ -37,12 +37,10 @@ function updateOriDesc() {
 function loadConfig() {
   return new Promise(function (resolve) {
     chrome.storage.local.get(DEFAULT_CONFIG, function (items) {
-      // 合并默认值，防止旧版本数据缺字段
       var cfg = {};
       Object.keys(DEFAULT_CONFIG).forEach(function (k) {
         cfg[k] = (items[k] === undefined) ? DEFAULT_CONFIG[k] : items[k];
       });
-      // 旧版本迁移：把旧的 position 字段直接丢弃
       delete cfg.position;
       resolve(cfg);
     });
@@ -101,26 +99,55 @@ function collectForm() {
   };
 }
 
+// 自动保存并通知 content script
+function autoSave() {
+  var cfg = collectForm();
+  saveConfig(cfg).then(function (ok) {
+    if (!ok) {
+      showStatus("保存失败", "error");
+      return;
+    }
+    notifyContentScript(cfg).then(function (r) {
+      if (r.skip) {
+        showStatus("已保存（非 B站视频页）");
+      } else if (r.err) {
+        showStatus("已保存，刷新生效");
+      } else {
+        showStatus("已应用", "success");
+      }
+    });
+  });
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   loadConfig().then(fillForm);
 
-  $("orientation").addEventListener("change", updateOriDesc);
+  // 控件变化自动保存
+  $("orientation").addEventListener("change", function () {
+    updateOriDesc();
+    autoSave();
+  });
+  $("fixedPosition").addEventListener("change", autoSave);
+  $("showPercent").addEventListener("change", autoSave);
+  $("showTime").addEventListener("change", autoSave);
 
-  $("save").addEventListener("click", function () {
-    var cfg = collectForm();
-    saveConfig(cfg).then(function (ok) {
-      if (!ok) {
-        showStatus("保存失败：storage 不可用", "error");
-        return;
-      }
-      notifyContentScript(cfg).then(function (r) {
-        if (r.skip) {
-          showStatus("已保存（当前不是 B站视频页，下次进入生效）", "success");
-        } else if (r.err) {
-          showStatus("已保存，刷新页面生效", "success");
-        } else {
-          showStatus("已保存并应用", "success");
+  // popup 关闭时兜底保存
+  window.addEventListener("unload", autoSave);
+
+  $("resetPos").addEventListener("click", function () {
+    chrome.storage.local.remove("floatPos", function () {
+      getCurrentTab().then(function (tab) {
+        if (!isBilibiliVideoTab(tab)) {
+          showStatus("已重置（非 B站视频页）", "success");
+          return;
         }
+        chrome.tabs.sendMessage(tab.id, { type: "BILI_CP_RESET_POS" }, function () {
+          if (chrome.runtime.lastError) {
+            showStatus("已重置，刷新生效", "success");
+          } else {
+            showStatus("已重置到默认右下角", "success");
+          }
+        });
       });
     });
   });
@@ -135,7 +162,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (chrome.runtime.lastError) {
           showStatus("content script 未响应，请刷新页面后重试", "error");
         } else {
-          showStatus("诊断信息已输出到 DevTools Console，请按 F12 查看", "success");
+          showStatus("诊断信息已输出到 DevTools Console", "success");
         }
       });
     });
